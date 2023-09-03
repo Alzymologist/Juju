@@ -1,6 +1,7 @@
 <html><head>
 
 <script language='JavaScript'>
+// page_onstart=["LOADS(['/juju.js?"+Math.random()+"','/j.js?"+Math.random()+"'],function(){JU.init();JU2.init();});"];
  page_onstart=["LOADS('/juju.js?"+Math.random()+"',function(){JU.init()});"];
  var s=document.createElement('script');
  s.type='text/javascript';
@@ -9,14 +10,28 @@
 </script>
 
 <style>
+
 #range1,#range2 { width:200px; }
 #width1,#width2 { width:100px; }
 
 #result1t,#result2t,
-#range1t,#width1t,#range2t,#width2t { width:60px; display:inline-block; }
+#range1t,#width1t,#range2t,#width2t,
+#resdiv1,#resdiv2 { width:40pt; display:inline-block; }
+
+#rang1,#rang2 { position:absolute; height:100%; width:0px; top:0px; left:0px; }
+
+#rang1w,#rang2w { cursor: col-resize; position:absolute; height:100%; width:6px; top:0px; right:0px; }
+#rang1w { background-color:rgb(255,0,0,0.2); }
+#rang2w { background-color:rgb(0,255,0,0.2); }
+
+#div_range1,#div_range2 { display: table; padding:5px; }
+
+#rang1,#div_range1 { background-color:rgb(255,0,0,0.1); }
+#rang2,#div_range2 { background-color:rgb(0,255,0,0.1); }
+
 </style>
 
-<link href='/sys.css' rel='stylesheet' type='text/css' charset='windows-1251' />
+<link href='/sys.css?123999' rel='stylesheet' type='text/css' charset='windows-1251' />
 </head>
 
 <body><!-- (c) Леонид Каганов https://lleo.me -->
@@ -36,19 +51,26 @@ Mic: <input type='checkbox' onchange='JU.www_cb(this)' checked>
 <div id='buka' style='pointer-events:none;position:absolute;top:10px;left:10px;z-index:100;color:red;'></div>
 
 <center>
-<div>
+<div id='div_range1'>
 <input ramsave id='range1' type="range" min="0" max="255" onchange="JU.www_range(1,this)" oninput="JU.www_range(2,this)">
 <input ramsave id='width1' type="range" min="1" max="256" onchange="JU.www_range(1,this)" oninput="JU.www_range(2,this)">
-&nbsp;<div id='range1t'></div>&mdash;<div id='width1t'></div>&nbsp;&nbsp;<div id='result1t'></div>
+&nbsp;<div id='range1t'></div>&mdash;<div id='width1t'></div>&nbsp;&nbsp;<div id='result1t'></div>&nbsp;&nbsp;<div id='resdiv1'></div>
 </div>
 
-<div>
+<div id='div_range2'>
 <input ramsave id='range2' type="range" min="0" max="255" onchange="JU.www_range(1,this)" oninput="JU.www_range(2,this)">
 <input ramsave id='width2' type="range" min="1" max="256" onchange="JU.www_range(1,this)" oninput="JU.www_range(2,this)">
-&nbsp;<div id='range2t'></div>&mdash;<div id='width2t'></div>&nbsp;&nbsp;<div id='result2t'></div>
+&nbsp;<div id='range2t'></div>&mdash;<div id='width2t'></div>&nbsp;&nbsp;<div id='result2t'></div>&nbsp;&nbsp;<div id='resdiv2'></div>
 </div>
 
-<canvas class='rama' id='canvas'></canvas>
+<div class='rama'>
+<div style='position:relative'>
+<div id='rang1'><div id='rang1w'></div></div>
+<div id='rang2'><div id='rang2w'></div></div>
+<canvas id='canvas'></canvas>
+</div>
+<div>
+
 </center>
 
 </body></html>

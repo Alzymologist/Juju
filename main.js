@@ -3,28 +3,28 @@ empty=function(s) { return (!s || ( typeof(s)=='object' && Object.keys(s).length
 var www_design='/design/';
 if(typeof(page_onstart)=='undefined') page_onstart=[];
 
-// задать нужный дизайн всплывающих окон
+// Р·Р°РґР°С‚СЊ РЅСѓР¶РЅС‹Р№ РґРёР·Р°Р№РЅ РІСЃРїР»С‹РІР°СЋС‰РёС… РѕРєРѕРЅ
 wintempl="<div id='{id}_body'>{s}</div><i id='{id}_close' title='Close' class='can'></i>";
 wintempl_cls='pop2 zoomIn animated';
 
 
-var zindexstart=100; // начало отсчета слоев для окон
-var activid=false; // id активного окна
-var hid=1; // счетчик окон
-var mHelps={}; // массив для окон: id:[hotkey,zindex]
+var zindexstart=100; // РЅР°С‡Р°Р»Рѕ РѕС‚СЃС‡РµС‚Р° СЃР»РѕРµРІ РґР»СЏ РѕРєРѕРЅ
+var activid=false; // id Р°РєС‚РёРІРЅРѕРіРѕ РѕРєРЅР°
+var hid=1; // СЃС‡РµС‚С‡РёРє РѕРєРѕРЅ
+var mHelps={}; // РјР°СЃСЃРёРІ РґР»СЏ РѕРєРѕРЅ: id:[hotkey,zindex]
 var hotkey=[]; // [code,(ctrlKey,shiftKey,altKey,metaKey),func]
-var hotkey_def=[]; // хоткеи главного окна
+var hotkey_def=[]; // С…РѕС‚РєРµРё РіР»Р°РІРЅРѕРіРѕ РѕРєРЅР°
 
 //========================================================
 if(typeof(hotkey_default)!='function') hotkey_default=function(){
     hotkey=[];
-    setkey('Escape','',function(e){ dom.del(isHelps())},true,1); // закрыть последнее окно
-    setkey('Enter','ctrl',function(e){if(!isHelps()) helper_go()},true,1); // если не открыто окон - окно правки
-    // setkey('Digit1','ctrl',function(e){keyalert=(keyalert?0:1);talert('Key scan '+(keyalert?'ON':'off'),1000);},false); // включение сканкодов
+    setkey('Escape','',function(e){ dom.del(isHelps())},true,1); // Р·Р°РєСЂС‹С‚СЊ РїРѕСЃР»РµРґРЅРµРµ РѕРєРЅРѕ
+    setkey('Enter','ctrl',function(e){if(!isHelps()) helper_go()},true,1); // РµСЃР»Рё РЅРµ РѕС‚РєСЂС‹С‚Рѕ РѕРєРѕРЅ - РѕРєРЅРѕ РїСЂР°РІРєРё
+    // setkey('Digit1','ctrl',function(e){keyalert=(keyalert?0:1);talert('Key scan '+(keyalert?'ON':'off'),1000);},false); // РІРєР»СЋС‡РµРЅРёРµ СЃРєР°РЅРєРѕРґРѕРІ
     // setkey('x','alt',function(e){alert('Scroll W/H='+getScrollW()+'/'+getScrollH()+'\ndocument.compatMode='+document.compatMode+'\nwindow.opera'+window.opera+'\ngetWin W/H='+getWinW()+'/'+getWinH()+'\ngetWin W0/H0='+getWinW0()+'/'+getWinH0()+'\ngetDoc W/H='+getDocW()+'/'+getDocH());},false);
-    // setkey('KeyE','',function(e){majax('editor.php',{a:'editform',num:num,comments:(dom('commpresent')?1:0)})},false); // редактор заметки
-    // setkey('KeyN','',function(e){majax('editor.php',{a:'newform',hid:++hid})},false); // новая заметка
-    setkey('KeyU','',function(e){majax('login.php',{a:'getinfo'})},true); // личная карточка
+    // setkey('KeyE','',function(e){majax('editor.php',{a:'editform',num:num,comments:(dom('commpresent')?1:0)})},false); // СЂРµРґР°РєС‚РѕСЂ Р·Р°РјРµС‚РєРё
+    // setkey('KeyN','',function(e){majax('editor.php',{a:'newform',hid:++hid})},false); // РЅРѕРІР°СЏ Р·Р°РјРµС‚РєР°
+    setkey('KeyU','',function(e){majax('login.php',{a:'getinfo'})},true); // Р»РёС‡РЅР°СЏ РєР°СЂС‚РѕС‡РєР°
 };
 
 page_onstart.push("hotkey_default()");
@@ -36,21 +36,21 @@ keykeys={ctrl:8,shift:4,alt:2,meta:1};
 function setkey(k,v,f,o,nav){ nav=nav?1:0; if(typeof(k)!='object') k=[k];
  for(var i=0;i<k.length;i++) {
 	    setkey0(k[i],v,f,o,nav);
-	    if(mHelps[activid]) mHelps[activid][0]=hotkey.slice(); else hotkey_def=hotkey.slice(); // и запомнить в массиве
+	    if(mHelps[activid]) mHelps[activid][0]=hotkey.slice(); else hotkey_def=hotkey.slice(); // Рё Р·Р°РїРѕРјРЅРёС‚СЊ РІ РјР°СЃСЃРёРІРµ
  }
 }
 
-function setkey0(k,v,f,o,nav){ // повесить функцию на нажатие клавиши
-    var e=0; for(var i in keykeys) if(v.indexOf(i)==0) e+=keykeys[i]; // сетка всяких шифтов-контролов
-    for(var i in hotkey) if(hotkey[i][0]==k && hotkey[i][1]==e){ // если уже есть - изменить
+function setkey0(k,v,f,o,nav){ // РїРѕРІРµСЃРёС‚СЊ С„СѓРЅРєС†РёСЋ РЅР° РЅР°Р¶Р°С‚РёРµ РєР»Р°РІРёС€Рё
+    var e=0; for(var i in keykeys) if(v.indexOf(i)==0) e+=keykeys[i]; // СЃРµС‚РєР° РІСЃСЏРєРёС… С€РёС„С‚РѕРІ-РєРѕРЅС‚СЂРѕР»РѕРІ
+    for(var i in hotkey) if(hotkey[i][0]==k && hotkey[i][1]==e){ // РµСЃР»Рё СѓР¶Рµ РµСЃС‚СЊ - РёР·РјРµРЅРёС‚СЊ
 	if(!f || f=='') delete hotkey[i]; else hotkey[i]=[k,e,f,o,nav];
 	return;
     }
-    if(!f || f=='') return; // если нет, и не задана функция, - просто выйти
-    if(e) hotkey.push([k,e,f,o,nav]); else hotkey.unshift([k,e,f,o,nav]); // иначе - задать с конца списк или с начала
+    if(!f || f=='') return; // РµСЃР»Рё РЅРµС‚, Рё РЅРµ Р·Р°РґР°РЅР° С„СѓРЅРєС†РёСЏ, - РїСЂРѕСЃС‚Рѕ РІС‹Р№С‚Рё
+    if(e) hotkey.push([k,e,f,o,nav]); else hotkey.unshift([k,e,f,o,nav]); // РёРЅР°С‡Рµ - Р·Р°РґР°С‚СЊ СЃ РєРѕРЅС†Р° СЃРїРёСЃРє РёР»Рё СЃ РЅР°С‡Р°Р»Р°
 }
 
-// новые функции DOM чтоб не стыдно было за быдлоимена
+// РЅРѕРІС‹Рµ С„СѓРЅРєС†РёРё DOM С‡С‚РѕР± РЅРµ СЃС‚С‹РґРЅРѕ Р±С‹Р»Рѕ Р·Р° Р±С‹РґР»РѕРёРјРµРЅР°
 
 dom=function(e){ return (typeof(e)=='object' ? e : ( document.getElementById(e) || false ) ) };
 
@@ -72,12 +72,12 @@ dom.off=function(e){ if(e=dom(e)) { e.style.display='none'; if(e.id!='tip') dom.
 // (id,'zoomOut',function_on_end);
 function noanim(e) { e.className=(e.className||'').replace(/ *[a-z0-9]+ animated/gi,''); };
 dom.effect=function(e,effect,fn) {
-    if(!e) return -1; // нет объекта
+    if(!e) return -1; // РЅРµС‚ РѕР±СЉРµРєС‚Р°
     // effect='i'+effect; // setTimeout("dier(document.styleSheets);",2000);
     noanim(e); var c=e.className; e.className=c+(c==''?'':' ')+effect+' animated';
     if( typeof(dom(e).onanimationend) != 'object' ) {
-	if(!e.animate) { if(fn)fn(); return -3; } // совсем нет анимации
-	setTimeout(function(){noanim(e);if(fn)fn();},1000); // если нет события конца анимации - то просто таймаут секунду
+	if(!e.animate) { if(fn)fn(); return -3; } // СЃРѕРІСЃРµРј РЅРµС‚ Р°РЅРёРјР°С†РёРё
+	setTimeout(function(){noanim(e);if(fn)fn();},1000); // РµСЃР»Рё РЅРµС‚ СЃРѕР±С‹С‚РёСЏ РєРѕРЅС†Р° Р°РЅРёРјР°С†РёРё - С‚Рѕ РїСЂРѕСЃС‚Рѕ С‚Р°Р№РјР°СѓС‚ СЃРµРєСѓРЅРґСѓ
 	return -4;
     }
     var fs=function(){ removeEvent(e,'animationend',fs); noanim(e); if(fn)fn(); };
@@ -88,22 +88,23 @@ dom.effect=function(e,effect,fn) {
 dom.del=function(e) {
     if(e===null||e===undefined) return;
 
+
     var id;
     if(typeof(e)=='object') {
-        if(typeof(e.id)!='undefined'&&e.id!='') id=e.id; // если есть имя, то взять имя
-        else { id='tmp_'+(hid++); e.id=id; } // иначе блять присвоить
+        if(typeof(e.id)!='undefined'&&e.id!='') id=e.id; // РµСЃР»Рё РµСЃС‚СЊ РёРјСЏ, С‚Рѕ РІР·СЏС‚СЊ РёРјСЏ
+        else { id='tmp_'+(hid++); e.id=id; } // РёРЅР°С‡Рµ Р±Р»СЏС‚СЊ РїСЂРёСЃРІРѕРёС‚СЊ
     } else {
 	id=e; e=dom(id);
     }
 
-    if(typeof(mHelps[id])!='undefined') { // окно было
-        delete(mHelps[id]); // удалить окно
-        mHelps_sort(top); // пересортировать
-        if(!isHelps()) { hotkey=hotkey_def.slice(); } // восстановить дефаулты
+    if(typeof(mHelps[id])!='undefined') { // РѕРєРЅРѕ Р±С‹Р»Рѕ
+        delete(mHelps[id]); // СѓРґР°Р»РёС‚СЊ РѕРєРЅРѕ
+        mHelps_sort(top); // РїРµСЂРµСЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ
+        if(!isHelps()) { hotkey=hotkey_def.slice(); } // РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ РґРµС„Р°СѓР»С‚С‹
     }
 
     if(e) {
-	var clen=function(){ if(e && e.parentNode)  e.parentNode.removeChild(e); };
+	var clen=function(){ if(e && e.parentNode) e.parentNode.removeChild(e); };
         if(typeof(e.onanimationend)!='object' || in_array(id,['tenek','ajaxgif'])) { dom.off(id); setTimeout(clen,40); }
         else dom.effect(e,'zoomOut',clen);
     } else if(typeof(idrename)!='undefined'&&typeof(idrename[id])!='undefined') { dom.del(idrename[id]); }
@@ -119,13 +120,13 @@ dobavil=dom.add;
 dobavil1=dom.add1;
 clean=dom.del;
 
-///////// ЭТУ ВСЮ ХУЙНЮ ПЕРЕДЕЛАТЬ БЫ
+///////// Р­РўРЈ Р’РЎР® РҐРЈР™РќР® РџР•Р Р•Р”Р•Р›РђРўР¬ Р‘Р«
 function cphash(a) {
     var b={}; for(var i in a) {
     if(typeof(a[i])!='undefined'){
     if(typeof(a[i])=='object' && typeof(a[i]['innerHTML'])!='string') b[i]=cphash(a[i]); else b[i]=a[i];}
     }
-    b.push=a.push; b.unshift=a.unshift; // йобаный патч!
+    b.push=a.push; b.unshift=a.unshift; // Р№РѕР±Р°РЅС‹Р№ РїР°С‚С‡!
     return b;
 }
 
@@ -134,7 +135,7 @@ function cpmas(a) { var b=[]; for(var i=0;i<a.length;i++){
     if(typeof(a[i])=='object' && typeof(a[i]['innerHTML'])!='string') b[i]=cphash(a[i]); else b[i]=a[i];}
 } return b; }
 
-function isHelps(){ var max=0,id=false; for(var k in mHelps){ if(mHelps[k][1]>=max){max=mHelps[k][1];id=k;} } return id; }// найти верхнее окно или false
+function isHelps(){ var max=0,id=false; for(var k in mHelps){ if(mHelps[k][1]>=max){max=mHelps[k][1];id=k;} } return id; }// РЅР°Р№С‚Рё РІРµСЂС…РЅРµРµ РѕРєРЅРѕ РёР»Рё false
 
 var print_r_id=0;
 var print_rid={};
@@ -178,11 +179,11 @@ function in_array(s,a){ for(var l in a) if(a[l]==s) return l; return false; }
 
 var JSload={};
 
-function mHelps_sort(top) { // сортировка окон по слоям возрастания с предлежащим окном тени
+function mHelps_sort(top) { // СЃРѕСЂС‚РёСЂРѕРІРєР° РѕРєРѕРЅ РїРѕ СЃР»РѕСЏРј РІРѕР·СЂР°СЃС‚Р°РЅРёСЏ СЃ РїСЂРµРґР»РµР¶Р°С‰РёРј РѕРєРЅРѕРј С‚РµРЅРё
     if(top=='salert') return;
 
     var mam=[],k=zindexstart,id=0; for(var i in mHelps) mam.push([i,mHelps[i][1]]);
-    if(!mam.length){ // если нету распахнутых окошек
+    if(!mam.length){ // РµСЃР»Рё РЅРµС‚Сѓ СЂР°СЃРїР°С…РЅСѓС‚С‹С… РѕРєРѕС€РµРє
 	dom.del('tenek');
 	hotkey=hotkey_def.slice();
 	activid=false;
@@ -212,10 +213,10 @@ var LOADES={};
 
 function urlajax(s,dir) { return ( s.indexOf('://')<0 && s.substring(0,1) != '/' ? (dir?dir:www_ajax)+s : s ); }
 
-// умная подгрузка
-// первый аргумент - имя файлы js или css или массив ['1.js','2.js','1.css']
-// второй необязательный аргумент - фанкция, запускаемая по окончании удачной загрузке ВСЕХ перечисленных
-// третий необязательный - функция при ошибке
+// СѓРјРЅР°СЏ РїРѕРґРіСЂСѓР·РєР°
+// РїРµСЂРІС‹Р№ Р°СЂРіСѓРјРµРЅС‚ - РёРјСЏ С„Р°Р№Р»С‹ js РёР»Рё css РёР»Рё РјР°СЃСЃРёРІ ['1.js','2.js','1.css']
+// РІС‚РѕСЂРѕР№ РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ Р°СЂРіСѓРјРµРЅС‚ - С„Р°РЅРєС†РёСЏ, Р·Р°РїСѓСЃРєР°РµРјР°СЏ РїРѕ РѕРєРѕРЅС‡Р°РЅРёРё СѓРґР°С‡РЅРѕР№ Р·Р°РіСЂСѓР·РєРµ Р’РЎР•РҐ РїРµСЂРµС‡РёСЃР»РµРЅРЅС‹С…
+// С‚СЂРµС‚РёР№ РЅРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ - С„СѓРЅРєС†РёСЏ РїСЂРё РѕС€РёР±РєРµ
 function LOADS(u,f,err,sync) { if(typeof(u)=='string') u=[u];
     var s;
     for(var i in u) { if(LOADES[u[i]]) continue;
@@ -249,11 +250,11 @@ LOADS_promice=include=function(file,sync){
 };
 
 
-// создать новый <DIV class='cls' id='id'>s</div> в элементе paren (если не указан - то просто в документе)
-// если указан relative - то следующим за relative
-// если relative=='first'(или 0) - в начало
-// если relative==['before',relative] - то перед relative
-// иначе (рекомндуется писать 'last') - в конец
+// СЃРѕР·РґР°С‚СЊ РЅРѕРІС‹Р№ <DIV class='cls' id='id'>s</div> РІ СЌР»РµРјРµРЅС‚Рµ paren (РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅ - С‚Рѕ РїСЂРѕСЃС‚Рѕ РІ РґРѕРєСѓРјРµРЅС‚Рµ)
+// РµСЃР»Рё СѓРєР°Р·Р°РЅ relative - С‚Рѕ СЃР»РµРґСѓСЋС‰РёРј Р·Р° relative
+// РµСЃР»Рё relative=='first'(РёР»Рё 0) - РІ РЅР°С‡Р°Р»Рѕ
+// РµСЃР»Рё relative==['before',relative] - С‚Рѕ РїРµСЂРµРґ relative
+// РёРЅР°С‡Рµ (СЂРµРєРѕРјРЅРґСѓРµС‚СЃСЏ РїРёСЃР°С‚СЊ 'last') - РІ РєРѕРЅРµС†
 rootElement=false;
 function mkdiv(id,s,cls,paren,relative,display){ if(dom(id)) { dom.s(id,s); dom(id).className=cls; return; }
     var div=document.createElement('DIV');
@@ -279,12 +280,12 @@ function newdiv(s,ara,paren,relative,display){ if(typeof(ara)!='object') ara={};
     return div;
 }
 
-function posdiv(id,x,y) { // позиционирование с проверкой на вылет, если аргумент '-1' - по центру экрана
+function posdiv(id,x,y) { // РїРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРµ СЃ РїСЂРѕРІРµСЂРєРѕР№ РЅР° РІС‹Р»РµС‚, РµСЃР»Рё Р°СЂРіСѓРјРµРЅС‚ '-1' - РїРѕ С†РµРЅС‚СЂСѓ СЌРєСЂР°РЅР°
     var e=dom(id),W,w,H,h,SW,SH,DW,DH;
 
     e.style.position='absolute';
     w=e.clientWidth; h=e.clientHeight;
-    e.style.display='none'; // перед измерением убрать
+    e.style.display='none'; // РїРµСЂРµРґ РёР·РјРµСЂРµРЅРёРµРј СѓР±СЂР°С‚СЊ
     W=getWinW(); H=getWinH(); SW=getScrollW(); SH=getScrollH();
     e.style.display='block';
     var es=e.currentStyle||window.getComputedStyle(e);
@@ -338,17 +339,28 @@ if(!dom(id)) {
 
     if(!wt) wt=wintempl;
     mkdiv(id,wt.replace(/\{id\}/g,id).replace(/\{s\}/g,s),wintempl_cls+(cls?' '+cls:''));
-    if(dom(id+'_close')) dom(id+'_close').onclick=function(e){dom.del(id)};
+
+    if(dom(id+'_close')) dom(id+'_close').onclick=function(e){ dom.del(id); };
+
     init_tip(dom(id));
 
-// (c)mkm Вот рецепт локального счастья, проверенный в Опера10, ИЕ6, ИЕ8, FF3, Safari, Chrome.
-// Таскать окно можно за 'рамку' - элементы от id до id+'_body', исключая body (и всех его детей).
-var e_body=dom(id+'_body'); // За тело не таскаем
-var hmov=false; // Предыдущие координаты мыши
-// var hmov2=1; // тащим
-var e=dom(id);
+    onMoveObject(dom(id),false,
+	function(e) {
+	    if(e.className=='legend' || e.id==id+'_body') return dom(id);
+	    return ( e.id==id ? e : false );
+	}
+    );
 
-var pnt=e; while(pnt.parentNode) pnt=pnt.parentNode; //Ищем Адама
+
+/*
+
+// (c)mkm Р’РѕС‚ СЂРµС†РµРїС‚ Р»РѕРєР°Р»СЊРЅРѕРіРѕ СЃС‡Р°СЃС‚СЊСЏ, РїСЂРѕРІРµСЂРµРЅРЅС‹Р№ РІ РћРїРµСЂР°10, РР•6, РР•8, FF3, Safari, Chrome.
+// РўР°СЃРєР°С‚СЊ РѕРєРЅРѕ РјРѕР¶РЅРѕ Р·Р° 'СЂР°РјРєСѓ' - СЌР»РµРјРµРЅС‚С‹ РѕС‚ id РґРѕ id+'_body', РёСЃРєР»СЋС‡Р°СЏ body (Рё РІСЃРµС… РµРіРѕ РґРµС‚РµР№).
+var e_body=dom(id+'_body'); // Р—Р° С‚РµР»Рѕ РЅРµ С‚Р°СЃРєР°РµРј
+var hmov=false; // РџСЂРµРґС‹РґСѓС‰РёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РјС‹С€Рё
+// var hmov2=1; // С‚Р°С‰РёРј
+var e=dom(id);
+var pnt=e; while(pnt.parentNode) pnt=pnt.parentNode; //РС‰РµРј РђРґР°РјР°
 
 			var mmFunc=function(ev) { ev=ev||window.event; if(hmov) {
 				e.style.left = parseFloat(e.style.left)+ev.clientX-hmov.x+'px';
@@ -370,40 +382,43 @@ var pnt=e; while(pnt.parentNode) pnt=pnt.parentNode; //Ищем Адама
 		addEvent(e,'mousedown', function(ev){ if(hmov) return;
 
 			ev=ev||window.event;
-			var lbtn=(window.addEventListener?0:1); //Если ИЕ, левая кнопка=1, иначе 0
+			var lbtn=(window.addEventListener?0:1); //Р•СЃР»Рё РР•, Р»РµРІР°СЏ РєРЅРѕРїРєР°=1, РёРЅР°С‡Рµ 0
 			if(!ev.target) ev.target=ev.srcElement;
-			if((lbtn!==ev.button)) return; //Это была не левая кнопка или 'тело' окна, ничего не делаем
+			if((lbtn!==ev.button)) return; //Р­С‚Рѕ Р±С‹Р»Р° РЅРµ Р»РµРІР°СЏ РєРЅРѕРїРєР° РёР»Рё 'С‚РµР»Рѕ' РѕРєРЅР°, РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј
 			var tgt=ev.target;
 			while(tgt){
-			    if(tgt.className=='legend') { tgt=e; break; } // и за заголовок class='legend' можно тоже таскать
+			    if(tgt.className=='legend') { tgt=e; break; } // Рё Р·Р° Р·Р°РіРѕР»РѕРІРѕРє class='legend' РјРѕР¶РЅРѕ С‚РѕР¶Рµ С‚Р°СЃРєР°С‚СЊ
 			    if(tgt==e_body) return;
 			    if(tgt==e) break;
 			    tgt=tgt.parentNode;
 			};
-			//Начинаем перетаскивать
+			//РќР°С‡РёРЅР°РµРј РїРµСЂРµС‚Р°СЃРєРёРІР°С‚СЊ
 			e.style.cursor='move';
 			// hmov2=0;
 			hmov={ x:ev.clientX, y:ev.clientY };
+
 			addEvent(pnt,'mousemove',mmFunc);
 			addEvent(pnt,'mouseup',muFunc);
+
 			if(ev.preventDefault) ev.preventDefault();
 			return false;
 		});
+*/
 // ===========================================================================
 
 ++hid;
 
 if(!pos) posdiv(id,mouse_x,mouse_y);
 
-mHelps[id]=[hotkey.slice(),999999]; // сделать самым верхним
+mHelps[id]=[hotkey.slice(),999999]; // СЃРґРµР»Р°С‚СЊ СЃР°РјС‹Рј РІРµСЂС…РЅРёРј
 } else dom.s(id+'_body',s);
 
-hotkey=hotkey_def.slice(); // обнулить для окна все шоткеи
-setTimeout("mHelps_sort('"+id+"');",10); // пересортировать
+hotkey=hotkey_def.slice(); // РѕР±РЅСѓР»РёС‚СЊ РґР»СЏ РѕРєРЅР° РІСЃРµ С€РѕС‚РєРµРё
+setTimeout("mHelps_sort('"+id+"');",10); // РїРµСЂРµСЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ
 addEvent(dom(id),'click',function(){ mHelps_sort(this.id); });
 }
 
-// координаты мыши
+// РєРѕРѕСЂРґРёРЅР°С‚С‹ РјС‹С€Рё
 var mouse_x=mouse_y=0;
 document.onmousemove = function(e){ e=e||window.event;
   if(e.pageX || e.pageY) { mouse_x=e.pageX; mouse_y=e.pageY; }
@@ -452,12 +467,12 @@ f_del=function(k){
     var cm='removeItem'; try { return window.localStorage[cm](k); } catch(e) { return err_store(e,arguments.callee.name,cm); }
 };
 
-err_store=function(e,fnam,cm) { // да блять, иногда даже они рушатся
+err_store=function(e,fnam,cm) { // РґР° Р±Р»СЏС‚СЊ, РёРЅРѕРіРґР° РґР°Р¶Рµ РѕРЅРё СЂСѓС€Р°С‚СЃСЏ
     if(!window.localStorage || !window.localStorage[cm]) return false;
 
     if(e.name=='NS_ERROR_FILE_CORRUPTED') alert("\
-Опс, да у вас ебанулось браузерное хранилище!\nУ меня такое было, когда я скопировал папку от старого Firefox в новый.\
-\n\nНе думаю, что проблема ограничится лишь этим сайтом. Надо найти и ручками ёбнуть файлы типа:\
+РћРїСЃ, РґР° Сѓ РІР°СЃ РµР±Р°РЅСѓР»РѕСЃСЊ Р±СЂР°СѓР·РµСЂРЅРѕРµ С…СЂР°РЅРёР»РёС‰Рµ!\nРЈ РјРµРЅСЏ С‚Р°РєРѕРµ Р±С‹Р»Рѕ, РєРѕРіРґР° СЏ СЃРєРѕРїРёСЂРѕРІР°Р» РїР°РїРєСѓ РѕС‚ СЃС‚Р°СЂРѕРіРѕ Firefox РІ РЅРѕРІС‹Р№.\
+\n\nРќРµ РґСѓРјР°СЋ, С‡С‚Рѕ РїСЂРѕР±Р»РµРјР° РѕРіСЂР°РЅРёС‡РёС‚СЃСЏ Р»РёС€СЊ СЌС‚РёРј СЃР°Р№С‚РѕРј. РќР°РґРѕ РЅР°Р№С‚Рё Рё СЂСѓС‡РєР°РјРё С‘Р±РЅСѓС‚СЊ С„Р°Р№Р»С‹ С‚РёРїР°:\
 \n~/.mozilla/firefox/3t20ifl1.default/webappsstore.sqlite\
 \n~/.mozilla/firefox/3t20ifl1.default/webappsstore.sqlite-wal");
     else alert('Error ['+cm+'] '+fnam+'(): '+e.name);
@@ -466,14 +481,14 @@ err_store=function(e,fnam,cm) { // да блять, иногда даже они рушатся
 
 time=function(){ return new Date().getTime(); };
 
-// bigfoto - заебался отдельно пристыковывать
+// bigfoto - Р·Р°РµР±Р°Р»СЃСЏ РѕС‚РґРµР»СЊРЅРѕ РїСЂРёСЃС‚С‹РєРѕРІС‹РІР°С‚СЊ
 // BigLoadImg("http://lleo.aha.ru/tmp/img.php?text="+Math.random());
-// Два варианта вызова: либо модулем для серии фоток, либо без второго параметра просто bigfoto('somepath/file.jpg')
+// Р”РІР° РІР°СЂРёР°РЅС‚Р° РІС‹Р·РѕРІР°: Р»РёР±Рѕ РјРѕРґСѓР»РµРј РґР»СЏ СЃРµСЂРёРё С„РѕС‚РѕРє, Р»РёР±Рѕ Р±РµР· РІС‚РѕСЂРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РїСЂРѕСЃС‚Рѕ bigfoto('somepath/file.jpg')
 // <img style='border:1px solid #ccc' onclick="return bigfoto('/backup/kniga_big.gif')" src="/backup/kniga_small.gif">
 
 var BigImgMas={},bigtoti=0,bigtotp=0;
 function bigfoto(i,p){ if(typeof(i)=='object') i=i.href;
-var TDATA=(p!=undefined && isNaN(p) ? p : false); // переданы ли полезные слова вторым аргументом?
+var TDATA=(p!=undefined && isNaN(p) ? p : false); // РїРµСЂРµРґР°РЅС‹ Р»Рё РїРѕР»РµР·РЅС‹Рµ СЃР»РѕРІР° РІС‚РѕСЂС‹Рј Р°СЂРіСѓРјРµРЅС‚РѕРј?
 
 var Z=( p==undefined || TDATA!==false ); var n=Z?i:i+','+p;
 
@@ -491,7 +506,7 @@ if(BigImgMas[n].width*BigImgMas[n].height==0) { setTimeout('bigfoto('+(Z ? '"'+n
 if(Z) var tt="<div id='bigfostr' class=r>"+(TDATA===false?n:TDATA)+"</div>";
 else {
 var g=i; while(dom('bigfot'+p+'_'+g)) g++;
-var tt=(g>1?(i+1)+" / "+g:'')+(dom('bigfott'+p+'_'+i)?"    <div style='display:inline;' title='nexпредыдущая/следующая: стрелки клавиатуры' id='bigfottxt'>"+dom.s('bigfott'+p+'_'+i)+'</div>':'');
+var tt=(g>1?(i+1)+" / "+g:'')+(dom('bigfott'+p+'_'+i)?"В  В  <div style='display:inline;' title='nexРїСЂРµРґС‹РґСѓС‰Р°СЏ/СЃР»РµРґСѓСЋС‰Р°СЏ: СЃС‚СЂРµР»РєРё РєР»Р°РІРёР°С‚СѓСЂС‹' id='bigfottxt'>"+dom.s('bigfott'+p+'_'+i)+'</div>':'');
 if(tt!='') tt="<div id='bigfostr' class='r'>"+tt+"</div>";
 }
 var navl=Z?'':"<div id='bigfotol' style='position:absolute;top:0px;left:0px;'"+((!i)?'>':" title='prev' onclick='bigfoto(bigtoti-1,bigtotp)' onmouseover=\"dom.on('bigfotoli')\" onmouseout=\"dom.off('bigfotoli')\"><i id='bigfotoli' style='position:absolute;top:0px;left:3px;display:none;' class='e_DiKiJ_l'></i>")+"</div>";
@@ -527,14 +542,14 @@ dom.s('tip','<div class="b-popup-outer"><div class="b-popup-inner"><div id="rtip
 var attr,j,i,a,s,e,t,el=['a','label','input','img','span','div','textarea','area','select','i','td'];
 for(j=0;j<el.length;j++){ t=el[j]; e=w.getElementsByTagName(t); if(e){ for(i=0;i<e.length;i++){ a=e[i];
 
-if(t=='img') { // для ошибки при загрузки картинок
+if(t=='img') { // РґР»СЏ РѕС€РёР±РєРё РїСЂРё Р·Р°РіСЂСѓР·РєРё РєР°СЂС‚РёРЅРѕРє
     a.setAttribute('onerror','erimg(this)');
     a.setAttribute('src',a.getAttribute('src'));
-} else if(t=='input'||t=='textarea'||t=='select') { // и отключить навигацию для INPUT и TEXTAREA
+} else if(t=='input'||t=='textarea'||t=='select') { // Рё РѕС‚РєР»СЋС‡РёС‚СЊ РЅР°РІРёРіР°С†РёСЋ РґР»СЏ INPUT Рё TEXTAREA
 	attr=a.getAttribute('ramsave');
-	if(attr!==null && !a.defaultValue) { // если указан атрибут ramsave='name', то сохранять в памяти браузера эту переменную и восстанавливать
+	if(attr!==null && !a.defaultValue) { // РµСЃР»Рё СѓРєР°Р·Р°РЅ Р°С‚СЂРёР±СѓС‚ ramsave='name', С‚Рѕ СЃРѕС…СЂР°РЅСЏС‚СЊ РІ РїР°РјСЏС‚Рё Р±СЂР°СѓР·РµСЂР° СЌС‚Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ Рё РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ
 		if(attr=='') {
-		    attr=(a.id?a.id:(a.name?a.name:attr)); // если =1, то имя такое же, как id или name
+		    attr=(a.id?a.id:(a.name?a.name:attr)); // РµСЃР»Рё =1, С‚Рѕ РёРјСЏ С‚Р°РєРѕРµ Р¶Рµ, РєР°Рє id РёР»Рё name
 		    a.setAttribute('ramsave',attr);
 		}
 		var vv=f_read(attr) || a.getAttribute('placeholder') || '';
@@ -600,7 +615,7 @@ document.onkeydown = function(e) { e=e||window.event;
     // if(keyalert) { setTimeout("talert('Code: "+kod+" Alt: "+ct+"',2000)",50); return false; }
 
     for(var i in hotkey) if( hotkey[i][0]==kod && hotkey[i][1]==(hotkey[i][1]&ct)) {
-        if(!hotkey[i][4]) return true; // навигация отключена для навигационных
+        if(!hotkey[i][4]) return true; // РЅР°РІРёРіР°С†РёСЏ РѕС‚РєР»СЋС‡РµРЅР° РґР»СЏ РЅР°РІРёРіР°С†РёРѕРЅРЅС‹С…
         setTimeout("hotkey["+i+"][2]('"+kod+" "+ct+"')",50);
         return hotkey[i][3];
     }
@@ -634,7 +649,7 @@ function talert(s,t){ mkdiv('talert',s,'qTip'); posdiv('talert',-1,-1); if(t) se
 
 function gethash_c(){ return 1*document.location.href.replace(/^.*?#(\d+)$/g,'$1'); }
 
-function plays(url,silent){ // silent: 1 - только загрузить, 0 - петь, 2 - петь НЕПРЕМЕННО, невзирая на настройки
+function plays(url,silent){ // silent: 1 - С‚РѕР»СЊРєРѕ Р·Р°РіСЂСѓР·РёС‚СЊ, 0 - РїРµС‚СЊ, 2 - РїРµС‚СЊ РќР•РџР Р•РњР•РќРќРћ, РЅРµРІР·РёСЂР°СЏ РЅР° РЅР°СЃС‚СЂРѕР№РєРё
     var audio = new Audio(url);
     if(silent!=1) audio.play();
 }
@@ -669,7 +684,7 @@ changemp3x=function(url,name,ee,mode,viewurl,download_name) { //  // strt
 
     if(/(youtu\.be\/|youtube\.com\/)/.test(url) || (url.indexOf('.')<0 && /(^|\/)(watch\?v\=|)([^\s\?\/\&]+)($|\"|\'|\?.*|\&.*)/.test(url))) { // "
 
- 	var tt=url.split('?start='); if(tt[1]) { start=1*tt[1]; url=tt[0]; } // ?start=1232343 в секундах
+ 	var tt=url.split('?start='); if(tt[1]) { start=1*tt[1]; url=tt[0]; } // ?start=1232343 РІ СЃРµРєСѓРЅРґР°С…
 	else {
 	  var exp2=/[\?\&]t=([\dhms]+)$/gi; if(exp2.test(url)) { var tt=url.match(exp2)[0]; // ?t=7m40s -> 460 sec
 	    if(/\d+s/.test(tt)) start+=1*tt.replace(/^.*?(\d+)s.*?$/gi,"$1");
@@ -692,7 +707,7 @@ changemp3x=function(url,name,ee,mode,viewurl,download_name) { //  // strt
     }
 
     if(/\.(mp4|avi|webm|mkv)$/.test(url)) s='<div>'+name+'</div><div><center><video controls autoplay id="audiidx" src="'+h(url)+
-'" width="640" height="480"><span style="border:1px dotted red">ВАШ БРАУЗЕР НЕ ПОДДЕРЖИВАЕТ MP4, МЕНЯЙТЕ ЕГО</span></video></center></div>';
+'" width="640" height="480"><span style="border:1px dotted red">Р’РђРЁ Р‘Р РђРЈР—Р•Р  РќР• РџРћР”Р”Р•Р Р–РР’РђР•Рў MP4, РњР•РќРЇР™РўР• Р•Р“Рћ</span></video></center></div>';
 
     else if(/\.(jpg)$/.test(url)) { // panorama JPG
 	s='<div>'+name+"</div><div id='panorama' "+WWH+"></div>";
@@ -701,7 +716,7 @@ changemp3x=function(url,name,ee,mode,viewurl,download_name) { //  // strt
     }
 
 else s='<div>'+name+'</div><div><center><audio controls autoplay id="audiidx"><source src="'+h(url)+
-'" type="audio/mpeg; codecs=mp3"><span style="border:1px dotted red">ВАШ БРАУЗЕР НЕ ПОДДЕРЖИВАЕТ MP3, МЕНЯЙТЕ ЕГО</span></audio></center></div>';
+'" type="audio/mpeg; codecs=mp3"><span style="border:1px dotted red">Р’РђРЁ Р‘Р РђРЈР—Р•Р  РќР• РџРћР”Р”Р•Р Р–РР’РђР•Рў MP3, РњР•РќРЇР™РўР• Р•Р“Рћ</span></audio></center></div>';
 
 // if(viewurl) url=viewurl;
 
@@ -740,10 +755,10 @@ get_pole_ara=function(w,onlych) { var k=0,ara={names:''}; var el=['input','texta
 ) {
     var b=el[j]+':'+e[i].type;
 
-    if(b=='input:radio' && !e[i].checked) continue; // только нажатые
+    if(b=='input:radio' && !e[i].checked) continue; // С‚РѕР»СЊРєРѕ РЅР°Р¶Р°С‚С‹Рµ
 
     else if(b=='input:file') {
-	if(e[i].value=='') continue; // пустых файлов нам не надо
+	if(e[i].value=='') continue; // РїСѓСЃС‚С‹С… С„Р°Р№Р»РѕРІ РЅР°Рј РЅРµ РЅР°РґРѕ
 	var p=e[i].files,nf=e[i].name.replace(/\[\]/g,'_'),q; for(q=0;q<p.length;q++) { ara[nf+q]=p[q]; ara['names']+=' '+nf+q; k++; }
 	continue;
     } else if(b=='input:checkbox') {
@@ -780,7 +795,7 @@ progress=function(name,now,total,text) { name='progress'+(name?'_'+name:'');
     dom.s(name+'_proc',text);
 };
 
-function sizer(x) {  var i=0; for(;x>=1024;x/=1024,i++){} return Math.round(x,2)+['b','Kb','Mb','Gb','Tb','Pb'][i]; } // если отправка более 30кб - показывать прогресс
+function sizer(x) {  var i=0; for(;x>=1024;x/=1024,i++){} return Math.round(x,2)+['b','Kb','Mb','Gb','Tb','Pb'][i]; } // РµСЃР»Рё РѕС‚РїСЂР°РІРєР° Р±РѕР»РµРµ 30РєР± - РїРѕРєР°Р·С‹РІР°С‚СЊ РїСЂРѕРіСЂРµСЃСЃ
 
 ProgressFunc=function(e){ progress('ajax',e.loaded,e.total,sizer(e.total)+': %% %'); };
 
@@ -791,15 +806,15 @@ function catcherr(txt,e,code){ ohelpc('JSerr','JS error: '+h(txt),"<font color=r
 // ##############
 function majax(url,ara,js,METHOD,form) { if(!url.indexOf) { alert('Majax error url: '+url); return false; } url=urlajax(url);
 
-    if(!METHOD) { // выбрать метод
+    if(!METHOD) { // РІС‹Р±СЂР°С‚СЊ РјРµС‚РѕРґ
 	var ara_len=0; for(var i in ara) ara_len++;
-	var DD=Math.max(36*ara_len,256); // сколько байт добавит POST form-data?
+	var DD=Math.max(36*ara_len,256); // СЃРєРѕР»СЊРєРѕ Р±Р°Р№С‚ РґРѕР±Р°РІРёС‚ POST form-data?
 	U=0; for(var i in ara) {
 	    if(typeof(ara[i])=='object') { METHOD='FORM'; break; }
-	    U+=(encodeURIComponent(i+ara[i]).length - (i+ara[i]).length); // сколько байт добавит каждый следующий form-urlencoded?
-	    if(U>DD) { METHOD='FILE'; break; } // как только стало дороже - FILE
+	    U+=(encodeURIComponent(i+ara[i]).length - (i+ara[i]).length); // СЃРєРѕР»СЊРєРѕ Р±Р°Р№С‚ РґРѕР±Р°РІРёС‚ РєР°Р¶РґС‹Р№ СЃР»РµРґСѓСЋС‰РёР№ form-urlencoded?
+	    if(U>DD) { METHOD='FILE'; break; } // РєР°Рє С‚РѕР»СЊРєРѕ СЃС‚Р°Р»Рѕ РґРѕСЂРѕР¶Рµ - FILE
 	}
-	if(!METHOD) { if(U<256 && (''+document.location).substring(0,4)!='http') METHOD='GET'; else METHOD='POST'; } // если речь о копейках, то просто GET, иначе POST form-urlencoded
+	if(!METHOD) { if(U<256 && (''+document.location).substring(0,4)!='http') METHOD='GET'; else METHOD='POST'; } // РµСЃР»Рё СЂРµС‡СЊ Рѕ РєРѕРїРµР№РєР°С…, С‚Рѕ РїСЂРѕСЃС‚Рѕ GET, РёРЅР°С‡Рµ POST form-urlencoded
     }
 
     ajaxon();
@@ -821,20 +836,20 @@ function majax(url,ara,js,METHOD,form) { if(!url.indexOf) { alert('Majax error u
       };
 
     if(METHOD=='GET') {
-	var o=''; for(var i in ara) o+='&'+h(i)+'='+encodeURIComponent(ara[i]); o='zi='+arazig(ara)+o; // кидаем зигу
+	var o=''; for(var i in ara) o+='&'+h(i)+'='+encodeURIComponent(ara[i]); o='zi='+arazig(ara)+o; // РєРёРґР°РµРј Р·РёРіСѓ
 	x.open("GET",url+'?'+o,true);
 	x.send();
-	return; // нельзя false!!!!
+	return; // РЅРµР»СЊР·СЏ false!!!!
     }
 
     if(METHOD=='POST') {
-	var o=''; for(var i in ara) o+='&'+h(i)+'='+encodeURIComponent(ara[i]); o='zi='+arazig(ara)+o.replace(/%20/g,'+'); // кидаем зигу
+	var o=''; for(var i in ara) o+='&'+h(i)+'='+encodeURIComponent(ara[i]); o='zi='+arazig(ara)+o.replace(/%20/g,'+'); // РєРёРґР°РµРј Р·РёРіСѓ
 	x.open("POST",url,true);
 	x.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 	// x.setRequestHeader('Content-length',o.length);
 	// x.setRequestHeader('Connection','close');
 	x.send(o);
-	return; // нельзя false!!!!
+	return; // РЅРµР»СЊР·СЏ false!!!!
     }
 
     if(METHOD=='FILE') {
@@ -849,7 +864,7 @@ function majax(url,ara,js,METHOD,form) { if(!url.indexOf) { alert('Majax error u
 	x.setRequestHeader('Content-length',o.length);
 	x.setRequestHeader('Connection','close');
 	x.send(o);
-	return; // нельзя false!!!!
+	return; // РЅРµР»СЊР·СЏ false!!!!
     }
 
     if(METHOD=='FORM') {
@@ -861,7 +876,7 @@ function majax(url,ara,js,METHOD,form) { if(!url.indexOf) { alert('Majax error u
 	for(var i in ara) a[i]=ara[i];
 	var size=0; for(var i in a) { FD.append(i,a[i]); size+=typeof(a[i])=='object'?a[i].size:(''+a[i]).length; }
 	if(size>20*1024) x.upload.onprogress=ProgressFunc;
-	FD.append('zi',arazig(a)); // кидаем зигу
+	FD.append('zi',arazig(a)); // РєРёРґР°РµРј Р·РёРіСѓ
 	x.open("POST",url,true);
 	x.send(FD);
 	return false;
@@ -916,12 +931,12 @@ AJAX=function(url,opt,s) {
         } else xhr.send(s);
     } else xhr.send();
 
-    if(!async) return ( (xhr.status == 200 && xhr.readyState == 4)?xhr.responseText:false ); //xhr.statusText=='OK' // в хроме не работает блять
+    if(!async) return ( (xhr.status == 200 && xhr.readyState == 4)?xhr.responseText:false ); //xhr.statusText=='OK' // РІ С…СЂРѕРјРµ РЅРµ СЂР°Р±РѕС‚Р°РµС‚ Р±Р»СЏС‚СЊ
 
   } catch(e) { if(!async) return false; }
 };
 
-function AGET(url,s) { return AJAX(url,{noajax:1,async:false},s); } // асинхронно просто вернуть результат
+function AGET(url,s) { return AJAX(url,{noajax:1,async:false},s); } // Р°СЃРёРЅС…СЂРѕРЅРЅРѕ РїСЂРѕСЃС‚Рѕ РІРµСЂРЅСѓС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚
 
 function AJ(url,callback,s) { AJAX(url,{callback:callback,noajax:1},s); }
 
@@ -929,8 +944,8 @@ function AJC(name,period,url,callback,s) { if(!period) period=600;
     var t=1*(f_read(name+'_time'));
     var V=''+f_read(name);
     var T=parseInt(new Date().getTime()/1000);
-    if( (T < (t+period) ) && V!='') { if(callback) callback(V,url); } // вернуть кэш
-    // иначе начать AJAX
+    if( (T < (t+period) ) && V!='') { if(callback) callback(V,url); } // РІРµСЂРЅСѓС‚СЊ РєСЌС€
+    // РёРЅР°С‡Рµ РЅР°С‡Р°С‚СЊ AJAX
     var xhr=new XMLHttpRequest(); xhr.onreadystatechange=function(){ if(this.readyState==4 && this.status==200 && this.responseText!=null) {
             f_save(name,this.responseText);
             f_save(name+'_time',T);
@@ -944,15 +959,15 @@ function AJC(name,period,url,callback,s) { if(!period) period=600;
 // ==============================================
 function mpers(s,a) {
     return s.replace(/\{([^\{\}]+)\}/g,function(t0,t1){
-        if(typeof(a[t1])!='undefined') return a[t1]; // есть есть такое {значение} - вернуть его
-        if(t1.match(/[\s\,\.]+/g)!==null) return t0; // если и имена переменных что-то через запятую - то просто вернуть
+        if(typeof(a[t1])!='undefined') return a[t1]; // РµСЃС‚СЊ РµСЃС‚СЊ С‚Р°РєРѕРµ {Р·РЅР°С‡РµРЅРёРµ} - РІРµСЂРЅСѓС‚СЊ РµРіРѕ
+        if(t1.match(/[\s\,\.]+/g)!==null) return t0; // РµСЃР»Рё Рё РёРјРµРЅР° РїРµСЂРµРјРµРЅРЅС‹С… С‡С‚Рѕ-С‚Рѕ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ - С‚Рѕ РїСЂРѕСЃС‚Рѕ РІРµСЂРЅСѓС‚СЊ
 	var f=t1.substring(0,1),i=t1.substring(1);
 	if(f=='#') return (typeof(a[i])=='undefined'?'': h(a[i]) );
         return '';
     });
 }
 
-// скопировать
+// СЃРєРѕРїРёСЂРѕРІР°С‚СЊ
 cpbuf=function(e,message){ if(typeof(e)=='object') e=e.innerHTML; // navigator.clipboard.writeText(e);
     var area = document.createElement('textarea');
     document.body.appendChild(area);
@@ -967,3 +982,46 @@ cpbuf=function(e,message){ if(typeof(e)=='object') e=e.innerHTML; // navigator.c
 function lightgreen(s) { return "<font color='lightgreen'>"+s+"</font>"; }
 function green(s) { return "<font color='green'>"+s+"</font>"; }
 function red(s) { return "<font color='red'>"+s+"</font>"; }
+
+// РЅРѕРІС‹Рµ РѕРєРЅР°
+// onMoveObject(elem,fn,fntest)
+// elem - СЌР»РµРјРµРЅС‚, РєРѕС‚РѕСЂС‹Р№ РїСЂРµРґР»Р°РіР°РµС‚СЃСЏ РґРІРёРіР°С‚СЊ РїРѕ СЌРєСЂР°РЅСѓ (РІРёРґРёРјРѕ РЅРµРіРѕ position:absolute РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ)
+// fn(e,x,y) - СЃР°РјР° С„СѓРЅРєС†РёСЏ РґРІРёР¶РµРЅРёСЏ СЌР»РµРјРµРЅС‚Р° e РїРѕ СЃРјРµС‰РµРЅРёСЋ x Рё y, Р»СѓС‡С€Рµ РїРѕСЃС‚Р°РІРёС‚СЊ false Рё РґРѕРІРµСЂРёС‚СЊСЃСЏ РґРµС„РѕР»С‚РЅРѕР№
+// fntest(e) - С„СѓРЅРєС†РёСЏ РїСЂРѕРІРµСЂРєРё: РµСЃР»Рё СЂР°Р·СЂРµС€РµРЅРѕ РґРІРёРіР°С‚СЊ Р·Р° СЌС‚РѕС‚ СЌР»РµРјРµРЅС‚, РІРѕР·РІСЂР°С‰Р°РµС‚ СЌР»РµРјРµРЅС‚, РёРЅР°С‡Рµ false
+//    СЌС‚Рѕ СЃРґРµР»Р°РЅРѕ РїРѕС‚РѕРјСѓ, С‡С‚Рѕ РІ РѕСЃРЅРѕРІРЅРѕРј СЌР»РµРјРµРЅС‚Рµ РјРѕРіСѓС‚ Р±С‹С‚СЊ РІСЃСЏРєРёРµ РїРѕР»СЏ Рё РІРЅСѓС‚СЂРµРЅРЅРѕСЃС‚Рё, Р·Р° РєРѕС‚РѕСЂС‹Рµ РґРІРёРіР°С‚СЊ РЅРµ РЅР°РґРѕ
+//    СЌС‚Рё РґРІРµ С„СѓРЅРєС†РёРё РјРѕР¶РЅРѕ РЅРµ СѓРєР°Р·С‹РІР°С‚СЊ
+npx=function(s) { return 1 * (s ? (''+s).replace(/[^\d\-\.]/g,'') : 0); }; // parseFloat('0'+s);
+onMoveObject=function(elem,fn,fntest) { elem=dom(elem);
+    elem.style.cursor='move';
+
+    if(!fn) fn=function(e,dx,dy) {
+	var x,max=20;
+	x=npx(e.style.left)+dx; x=Math.max(x,max-npx(e.clientWidth)); x=Math.min(x,getDocW()-max); e.style.left=x+'px';
+	x=npx(e.style.top)+dy; x=Math.max(x,max-npx(e.clientHeight)); x=Math.min(x,getDocH()-max); e.style.top=x+'px';
+    };
+
+    var m="touchstart touchmove touchend mousedown".split(' ');
+    for(var l of m) elem.addEventListener(l,function(event) {
+	var e=event.target;
+        if(fntest && (e=fntest(e))===false) return;
+        try{ event.preventDefault(); event.stopPropagation(); }catch(er){}
+
+        var mStart=function(x,y) { e.LastMovX=x; e.LastMovY=y; e.classList.add('active-mov'); };
+        var fnRun=function(x,y) { fn(e, x-e.LastMovX, y-e.LastMovY); e.LastMovX=x; e.LastMovY=y; };
+
+        var pnt=e; while(pnt.parentNode) pnt=pnt.parentNode; // РС‰РµРј РђРґР°РјР°
+
+        var fnMove=function(ev) { fnRun(ev.clientX,ev.clientY); try { ev.preventDefault(); }catch(er){} return false; };
+        var fnUp=function(){ e.classList.remove('active-mov');pnt.removeEventListener("mousemove",fnMove); pnt.removeEventListener("mouseup",fnUp); };
+        // РЅР°Р¶Р°Р»Рё РїР°Р»СЊС†РµРј
+        if(event.type == 'touchstart') { mStart(event.targetTouches[0].pageX, event.targetTouches[0].pageY); }
+        // РЅР°Р¶Р°Р»Рё РјС‹С€СЊ
+        if(event.type == 'mousedown') { mStart(event.clientX, event.clientY); pnt.addEventListener("mousemove",fnMove); pnt.addEventListener("mouseup",fnUp); }
+        // РѕС‚РїСѓСЃС‚РёР»Рё РїР°Р»РµС†
+        if(event.type == 'touchend') { e.classList.remove('active-mov'); }
+        // С‚СЏРЅРµРј РїР°Р»СЊС†РµРј
+        if(event.type == 'touchmove') { // С‚РѕР»СЊРєРѕ 1 РєР°СЃР°РЅРёРµ
+            if(event.targetTouches.length == 1) fnRun(event.targetTouches[0].pageX,event.targetTouches[0].pageY);
+        }
+    });
+};

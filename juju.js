@@ -21,12 +21,7 @@ JU={
     height: 512,
     ku: 1,
     init: function() {
-	var v;
-	v='range1'; dom(v+'t').innerHTML=JU.range[v]=1*dom(v).value;
-	v='range2'; dom(v+'t').innerHTML=JU.range[v]=1*dom(v).value;
-	v='width1'; dom(v+'t').innerHTML=JU.range[v]=1*dom(v).value;
-	v='width2'; dom(v+'t').innerHTML=JU.range[v]=1*dom(v).value;
-
+	// разобраться с canvas
 	JU.grid=grid();
 	var d = dom('canvas');
         JU.size = (JU.fft / 2) *2;
@@ -35,13 +30,52 @@ JU={
         d.height=JU.height;
         d.style.height=JU.height+'px';
 
+	// выставить ползунки
+	JU.range={
+	    range1: 1*dom('range1').value,
+	    range2: 1*dom('range2').value,
+	    width1: 1*dom('width1').value,
+	    width2: 1*dom('width2').value,
+	};
+        JU.rerange();
+
+	// включить движение ползунков
+        var elemove=function(e,dx,dy) {
+	    var W=npx(dom('canvas').clientWidth), k=W / (JU.fft/2);
+
+	    if(e.id=='rang1' || e.id=='rang2') {
+		var x=npx(e.style.left)+dx; x=Math.max(x,2); x=Math.min(x,W-1);
+    		var l=Math.round(x/k);
+		var n=(e.id=='rang1'?'range1':'range2');
+		JU.range[n]=l; f_save(n,l);
+		dom(n).value=l; dom.s(n+'t',l);
+		e.style.left=x+'px';
+		return;
+	    }
+
+	    if(e.id=='rang1w' || e.id=='rang2w') {
+		var ee=e.parentNode;
+		var x=npx(ee.style.width)+dx; x=Math.max(x,1); // x=Math.min(x,W-1);
+    		var l=Math.round(x/k);
+		var n=(e.id=='rang1w'?'width1':'width2');
+		JU.range[n]=l; f_save(n,l);
+		dom(n).value=l; dom.s(n+'t',l);
+		ee.style.width=x+'px';
+		return;
+	    }
+
+	};
+        onMoveObject('rang1',elemove);
+        onMoveObject('rang2',elemove);
+
+	// запустить анализ
 	JU.Analyse();
     },
 
     draw: function(data) {
         JU.ku++;
 	var c = dom('canvas').getContext('2d');
-        c.globalAlpha = 1.0;
+//        c.globalAlpha = 1.0;
 	c.fillStyle = "#EEE"; c.fillRect(0,0,JU.size,JU.height);
 
 //	var ss=''; for(var i=0; i<data.length; i++) ss+=(data[i]==0?'_':'#')+((i+1)%128?'':'<br>');
@@ -65,11 +99,22 @@ JU={
 	dom.s('result1t',r1);
 	dom.s('result2t',r2);
 
+
+	var rr = r1+r2;
+	var prc = (rr==0 ? 0 : 100/(r1+r2));
+	// var q=(r1?r2/r1:100
+	dom.s('resdiv1',Math.floor(prc*r1)+'%');
+	dom.s('resdiv2',Math.floor(prc*r2)+'%');
+
+/*
         c.globalAlpha = 0.1;
 	c.fillStyle = "red";
         c.fillRect(JU.range.range1*2, 0, JU.range.width1*2, JU.height);
 	c.fillStyle = "green";
         c.fillRect(JU.range.range2*2, 0, JU.range.width2*2, JU.height);
+*/
+
+
     },
 
     get_ctx: function( stream ) {
@@ -110,11 +155,34 @@ JU={
         JU.analyser.connect(JU.processor);
     },
 
+    rerange: function(){
+	var W=npx(dom('canvas').clientWidth), k=W / (JU.fft/2);
+	var fn=function(n) {
+	    var rl=JU.range['range'+n],rw=JU.range['width'+n];
+	    dom('range'+n).value=rl;
+	    dom('width'+n).value=rw;
+	    dom.s('range'+n+'t',rl);
+	    dom.s('width'+n+'t',rw);
+
+	    var x=Math.floor(k*rl);
+	    var w=Math.floor(k*rw);
+	    if( x+w > W ) x = W-w;
+	    dom('rang'+n).style.left = 2+x+'px';
+	    dom('rang'+n).style.width = w+'px';
+	};
+	fn(1);
+	fn(2);
+    },
+
     www_range: function(mode,e) {
+     if(mode) {
 	var name=e.id;
 	var val=e.value;
 	JU.range[name]=val;
 	dom.s(name+'t',val);
+     }
+     JU.rerange();
+
     },
 
     www_play: function(e) {
